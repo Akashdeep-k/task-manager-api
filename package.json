@@ -2,14 +2,21 @@
   "name": "task-app",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app",
+    "dev": "nodemon --ext js,hbs --exec \" npm start \""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "mongodb": "^5.4.0"
+    "express": "^4.18.2",
+    "mongodb": "^5.5.0",
+    "mongoose": "^7.4.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }
