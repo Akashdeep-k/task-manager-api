@@ -19,6 +19,7 @@ const main = async () => {
             },
             email: {
                 type: String,
+                required: true,
                 validator(value){
                     if(!value.isEmail()){
                         throw new Error("Email is invalid");
