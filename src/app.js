@@ -126,6 +126,36 @@ app.patch("/tasks/:taskid", async (req, res) => {
     }
 });
 
+app.delete("/users/:userid", async (req, res) => {
+    try {
+        const { userid } = req.params;
+        const user = await userModel.findByIdAndDelete(userid);
+
+        if (!user) {
+            return res.status(404).send();
+        }
+
+        res.send(user);
+    } catch (e) {
+        res.status(500).send();
+    }
+});
+
+app.delete("/tasks/:taskid", async (req, res) => {
+    try {
+        const { taskid } = req.params;
+        const task = await taskModel.findByIdAndDelete(taskid);
+
+        if (!task) {
+            res.status(404).send();
+        }
+
+        res.send(task);
+    } catch (e) {
+        res.status(500).send();
+    }
+});
+
 app.listen(3000, () => {
     console.log("Server is running on port " + port)
 })
