@@ -1,11 +1,11 @@
 const express = require("express");
-const taskModel = require("../db/models/task.js");
+const Task = require("../db/models/task.js");
 
 const router = new express.Router();
 
 router.get("/tasks", async (req, res) => {
     try {
-        const tasks = await taskModel.find({});
+        const tasks = await Task.find({});
         res.send(tasks);
     } catch (e) {
         res.status(500).send(e);
@@ -15,7 +15,7 @@ router.get("/tasks", async (req, res) => {
 router.get("/tasks/:taskid", async (req, res) => {
     try {
         const { taskid } = req.params;
-        const task = await taskModel.findById(taskid);
+        const task = await Task.findById(taskid);
 
         if (!task) {
             return res.status(404).send();
@@ -29,7 +29,7 @@ router.get("/tasks/:taskid", async (req, res) => {
 
 router.post("/tasks", async (req, res) => {
     try {
-        const task = taskModel(req.body);
+        const task = Task(req.body);
         await task.save();
         res.send(task);
     } catch (e) {
@@ -50,7 +50,7 @@ router.patch("/tasks/:taskid", async (req, res) => {
         const { taskid } = req.params;
         const updates = req.body;
 
-        const task = await taskModel.findByIdAndUpdate(taskid, updates, { new: true, runValidators: true });
+        const task = await Task.findByIdAndUpdate(taskid, updates, { new: true, runValidators: true });
         if (!task) {
             return res.status(404).send();
         }
@@ -65,7 +65,7 @@ router.patch("/tasks/:taskid", async (req, res) => {
 router.delete("/tasks/:taskid", async (req, res) => {
     try {
         const { taskid } = req.params;
-        const task = await taskModel.findByIdAndDelete(taskid);
+        const task = await Task.findByIdAndDelete(taskid);
 
         if (!task) {
             res.status(404).send();
