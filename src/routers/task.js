@@ -44,17 +44,21 @@ router.patch("/tasks/:taskid", async (req, res) => {
     const validUpdates = updates.every((update) => allowedupdates.includes(update));
 
     if (!validUpdates) {
-        res.status(400).send("Error: invalid updates !!!");
+        return res.status(400).send("Error: invalid updates !!!");
     }
     try {
         const { taskid } = req.params;
-        const updates = req.body;
 
-        const task = await Task.findByIdAndUpdate(taskid, updates, { new: true, runValidators: true });
+        const task = await Task.findById(taskid);
+
         if (!task) {
             return res.status(404).send();
         }
 
+        updates.forEach(update => {
+            task[update] = req.body[update];
+        })
+        task.save();
         res.send(task);
 
     } catch (e) {
