@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -11,8 +12,8 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        validate(value){
-            if(!validator.isEmail(value)){
+        validate(value) {
+            if (!validator.isEmail(value)) {
                 throw new Error("Email is invalid");
             }
         }
@@ -22,26 +23,31 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true,
         minlength: 6,
-        maxlength:20,
-        validate(value){
-            if(value.toLowerCase().includes("password")){
+        maxlength: 20,
+        validate(value) {
+            if (value.toLowerCase().includes("password")) {
                 throw new Error("Password should not contain 'password'");
             }
         }
-    },  
+    },
     age: {
         type: Number,
         default: 0,
-        validate(value){
-            if(value < 0){
+        validate(value) {
+            if (value < 0) {
                 throw new Error("Age must be a positive number");
             }
         }
     }
 });
 
-userSchema.pre('save', async function(){
-
+userSchema.pre('save', async function (next) {
+    const user = this;
+    if (user.isModified("password")) {
+        console.log("hashing the password")
+        user.password = await bcrypt.hash(user.password, 8);
+    }
+    next();
 })
 
 const User = mongoose.model("User", userSchema);
