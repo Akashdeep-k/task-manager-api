@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -24,7 +25,6 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true,
         minlength: 6,
-        maxlength: 20,
         validate(value) {
             if (value.toLowerCase().includes("password")) {
                 throw new Error("Password should not contain 'password'");
@@ -39,8 +39,25 @@ const userSchema = new mongoose.Schema({
                 throw new Error("Age must be a positive number");
             }
         }
-    }
+    },
+    tokens: [{
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 });
+
+userSchema.methods.getAuthToken = async function () {
+    const user = this;
+    const token = jwt.sign({ _id: user._id.toString() }, "my first token", { expiresIn: "7d" });
+
+    user.tokens = user.tokens.concat({ token });
+    await user.save();
+
+    return token;
+
+}
 
 userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({ email });
