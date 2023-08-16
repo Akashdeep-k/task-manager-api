@@ -1,16 +1,16 @@
 const express = require("express");
 const User = require("../db/models/user.js");
+const auth = require("../middleware/auth.js");
 
 const router = new express.Router();
 
-router.get("/users", async (req, res) => {
+router.get("/users/me", auth, async (req, res) => {
     try {
-        const users = await User.find({});
-        res.send(users);
+        res.send(req.user);
     } catch (e) {
-        res.status(500).send(e);
+        res.status(400).send(e);
     }
-});
+})
 
 router.get("/users/:userid", async (req, res) => {
     try {
