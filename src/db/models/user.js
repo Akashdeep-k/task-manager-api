@@ -48,6 +48,12 @@ const userSchema = new mongoose.Schema({
     }]
 });
 
+userSchema.virtual('tasks', {
+    ref: "Task",
+    localField: "_id",
+    foreignField: "author"
+});
+
 userSchema.methods.getAuthToken = async function () {
     const user = this;
     const token = jwt.sign({ _id: user._id.toString() }, "my first token");
@@ -58,7 +64,7 @@ userSchema.methods.getAuthToken = async function () {
     return token;
 }
 
-userSchema.methods.toJSON = function(){
+userSchema.methods.toJSON = function () {
     const user = this;
     const userObject = user.toObject();
 
