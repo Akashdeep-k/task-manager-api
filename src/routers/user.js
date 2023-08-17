@@ -4,12 +4,8 @@ const auth = require("../middleware/auth.js");
 
 const router = new express.Router();
 
-router.get("/users/me", auth, async (req, res) => {
-    try {
-        res.send(req.user);
-    } catch (e) {
-        res.status(400).send(e);
-    }
+router.get("/users/me", auth, (req, res) => {
+    res.send(req.user);
 })
 
 router.get("/users/:userid", async (req, res) => {
@@ -45,6 +41,28 @@ router.post("/users/login", async (req, res) => {
         res.send({ user, token });
     } catch (e) {
         res.status(404).send(e);
+    }
+});
+
+router.post("/users/logout", auth, async (req, res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter((token) => {
+            return token.token !== req.token
+        });
+        await req.user.save();
+        res.send("Logged out successfully");
+    } catch (e) {
+        res.status(500).send(e);
+    }
+});
+
+router.post("/users/logoutAll", auth, async (req, res) => {
+    try{
+        req.user.tokens = [];
+        await req.user.save();
+        res.send("Logged out from all sessions successfully")
+    } catch(e){
+        res.status(500).send(e);
     }
 });
 
