@@ -4,19 +4,19 @@ const auth = require("../middleware/auth.js");
 
 const router = new express.Router();
 
-router.get("/tasks", async (req, res) => {
+router.get("/tasks", auth, async (req, res) => {
     try {
-        const tasks = await Task.find({});
-        res.send(tasks);
+        await req.user.populate("tasks");
+        res.send(req.user.tasks);
     } catch (e) {
         res.status(500).send(e);
     }
 });
 
-router.get("/tasks/:taskid", async (req, res) => {
+router.get("/tasks/:taskid", auth, async (req, res) => {
     try {
         const { taskid } = req.params;
-        const task = await Task.findById(taskid);
+        const task = await Task.findOne({_id: taskid, author: req.user})
 
         if (!task) {
             return res.status(404).send();
@@ -42,7 +42,7 @@ router.post("/tasks", auth, async (req, res) => {
     }
 });
 
-router.patch("/tasks/:taskid", async (req, res) => {
+router.patch("/tasks/:taskid", auth, async (req, res) => {
     const updates = Object.keys(req.body);
     const allowedupdates = ["description", "completed"];
 
@@ -54,7 +54,7 @@ router.patch("/tasks/:taskid", async (req, res) => {
     try {
         const { taskid } = req.params;
 
-        const task = await Task.findById(taskid);
+        const task = await Task.findOne({_id: taskid, author: req.user._id});
 
         if (!task) {
             return res.status(404).send();
@@ -71,10 +71,10 @@ router.patch("/tasks/:taskid", async (req, res) => {
     }
 });
 
-router.delete("/tasks/:taskid", async (req, res) => {
+router.delete("/tasks/:taskid", auth, async (req, res) => {
     try {
         const { taskid } = req.params;
-        const task = await Task.findByIdAndDelete(taskid);
+        const task = await Task.findOneAndDelete({_id: taskid, author: req.user._id});
 
         if (!task) {
             res.status(404).send();
