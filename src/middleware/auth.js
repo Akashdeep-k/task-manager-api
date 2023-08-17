@@ -3,10 +3,8 @@ const User = require("../db/models/user.js");
 
 const auth = async (req, res, next) => {
     try {
-        console.log("auth middleware");
         const token = req.header("Authorization").replace("Bearer ", "");
         const decoded_token = jwt.verify(token, "my first token");
-        console.log(decoded_token);
         const user = await User.findOne({ _id: decoded_token._id, 'tokens.token': token })
 
         if (!user) {

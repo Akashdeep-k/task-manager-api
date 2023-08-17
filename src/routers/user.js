@@ -5,23 +5,12 @@ const auth = require("../middleware/auth.js");
 const router = new express.Router();
 
 router.get("/users/me", auth, (req, res) => {
-    res.send(req.user);
-})
-
-router.get("/users/:userid", async (req, res) => {
-    try {
-        const { userid } = req.params;
-        const user = await User.findById(userid);
-
-        if (!user) {
-            return res.status(404).send();
-        }
-
-        res.send(user);
-    } catch (e) {
+    try{
+        res.send(req.user);
+    } catch(e){
         res.status(500).send(e);
     }
-});
+})
 
 router.post("/users", async (req, res) => {
     try {
@@ -66,7 +55,7 @@ router.post("/users/logoutAll", auth, async (req, res) => {
     }
 });
 
-router.patch("/users/:userid", async (req, res) => {
+router.patch("/users/me", auth, async (req, res) => {
     const updates = Object.keys(req.body);
     const allowedupdates = ["name", "email", "password", "age"];
 
@@ -77,34 +66,21 @@ router.patch("/users/:userid", async (req, res) => {
     }
 
     try {
-        const { userid } = req.params;
-        const user = await User.findById(userid);
-
-        if (!user) {
-            return res.status(404).send();
-        }
-
         updates.forEach((update) => {
-            user[update] = req.body[update];
+            req.user[update] = req.body[update];
         });
-        await user.save();
+        await req.user.save();
 
-        res.send(user);
+        res.send(req.user);
     } catch (e) {
         res.status(500).send(e);
     }
 });
 
-router.delete("/users/:userid", async (req, res) => {
+router.delete("/users/me", auth, async (req, res) => {
     try {
-        const { userid } = req.params;
-        const user = await User.findByIdAndDelete(userid);
-
-        if (!user) {
-            return res.status(404).send();
-        }
-
-        res.send(user);
+        await User.findByIdAndDelete(req.user._id);
+        res.send(req.user);
     } catch (e) {
         res.status(500).send();
     }
