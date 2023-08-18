@@ -1,13 +1,14 @@
 const express = require("express");
 const User = require("../db/models/user.js");
 const auth = require("../middleware/auth.js");
+const Task = require("../db/models/task.js");
 
 const router = new express.Router();
 
 router.get("/users/me", auth, (req, res) => {
-    try{
+    try {
         res.send(req.user);
-    } catch(e){
+    } catch (e) {
         res.status(500).send(e);
     }
 })
@@ -46,11 +47,11 @@ router.post("/users/logout", auth, async (req, res) => {
 });
 
 router.post("/users/logoutAll", auth, async (req, res) => {
-    try{
+    try {
         req.user.tokens = [];
         await req.user.save();
         res.send("Logged out from all sessions successfully")
-    } catch(e){
+    } catch (e) {
         res.status(500).send(e);
     }
 });
@@ -79,10 +80,11 @@ router.patch("/users/me", auth, async (req, res) => {
 
 router.delete("/users/me", auth, async (req, res) => {
     try {
-        await User.findByIdAndDelete(req.user._id);
+        await User.findByIdAndDelete( req.user._id );
+        await Task.deleteMany({ author: req.user._id })
         res.send(req.user);
     } catch (e) {
-        res.status(500).send();
+        res.status(500).send(e);
     }
 });
 
