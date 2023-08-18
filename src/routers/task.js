@@ -6,7 +6,14 @@ const router = new express.Router();
 
 router.get("/tasks", auth, async (req, res) => {
     try {
-        await req.user.populate("tasks");
+        const match = {}
+        if (req.query.completed) {
+            match.completed = req.query.completed === 'true';
+        }
+        await req.user.populate({
+            path: "tasks",
+            match
+        });
         res.send(req.user.tasks);
     } catch (e) {
         res.status(500).send(e);
@@ -16,7 +23,7 @@ router.get("/tasks", auth, async (req, res) => {
 router.get("/tasks/:taskid", auth, async (req, res) => {
     try {
         const { taskid } = req.params;
-        const task = await Task.findOne({_id: taskid, author: req.user})
+        const task = await Task.findOne({ _id: taskid, author: req.user })
 
         if (!task) {
             return res.status(404).send();
@@ -54,7 +61,7 @@ router.patch("/tasks/:taskid", auth, async (req, res) => {
     try {
         const { taskid } = req.params;
 
-        const task = await Task.findOne({_id: taskid, author: req.user._id});
+        const task = await Task.findOne({ _id: taskid, author: req.user._id });
 
         if (!task) {
             return res.status(404).send();
@@ -74,7 +81,7 @@ router.patch("/tasks/:taskid", auth, async (req, res) => {
 router.delete("/tasks/:taskid", auth, async (req, res) => {
     try {
         const { taskid } = req.params;
-        const task = await Task.findOneAndDelete({_id: taskid, author: req.user._id});
+        const task = await Task.findOneAndDelete({ _id: taskid, author: req.user._id });
 
         if (!task) {
             res.status(404).send();
