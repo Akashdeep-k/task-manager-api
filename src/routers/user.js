@@ -4,6 +4,7 @@ const auth = require("../middleware/auth.js");
 const Task = require("../db/models/task.js");
 const multer = require("multer")
 const sharp = require("sharp")
+const { sendWelcomeEmail, sendCancelationEmail } = require("../emails/account.js");
 
 const upload = multer({
     limits: {
@@ -31,6 +32,7 @@ router.post("/users", async (req, res) => {
     try {
         const user = new User(req.body);
         await user.save();
+        sendWelcomeEmail(user.email, user.name);
         const token = await user.getAuthToken();
         res.status(201).send({ user, token });
     } catch (e) {
@@ -96,6 +98,7 @@ router.delete("/users/me", auth, async (req, res) => {
     try {
         await User.findByIdAndDelete(req.user._id);
         await Task.deleteMany({ author: req.user._id })
+        sendCancelationEmail(req.user.email, req.user.name);
         res.send(req.user);
     } catch (e) {
         res.status(500).send(e);
@@ -103,7 +106,7 @@ router.delete("/users/me", auth, async (req, res) => {
 });
 
 router.post("/users/me/avatar", auth, upload.single("avatar"), async (req, res) => {
-    const buffer = await sharp(req.file.buffer).resize({width: 250, height: 250}).png().toBuffer();
+    const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer();
     req.user.avatar = buffer
     await req.user.save();
     res.send();
