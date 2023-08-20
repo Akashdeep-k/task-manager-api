@@ -62,7 +62,7 @@ userSchema.virtual('tasks', {
 
 userSchema.methods.getAuthToken = async function () {
     const user = this;
-    const token = jwt.sign({ _id: user._id.toString() }, "my first token");
+    const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET_KEY);
 
     user.tokens = user.tokens.concat({ token });
     await user.save();
@@ -102,16 +102,6 @@ userSchema.pre('save', async function (next) {
     }
     next();
 })
-
-// userSchema.pre('findByIdAndDelete', async function (next) {
-//     try {
-//         console.log("triggered");
-//         await Task.deleteMany({ author: this._id });
-//         next()
-//     } catch (e) {
-//         next(error);
-//     }
-// })
 
 const User = mongoose.model("User", userSchema);
 

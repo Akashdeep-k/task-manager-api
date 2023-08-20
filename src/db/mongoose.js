@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const uri = "mongodb+srv://akash:12345@task-app-cluster.7yzwku0.mongodb.net/task-manager-api";
+const uri = process.env.DATABASE_URL;
 
 const main = async () => {
     try {
