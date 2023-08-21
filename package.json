@@ -4,8 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "env-cmd -f ./config/dev.env nodemon src/app.js",
+    "start": "node src/index.js",
+    "dev": "env-cmd -f ./config/dev.env nodemon src/index.js",
     "test": "env-cmd -f ./config/test.env jest --watch"
   },
   "jest": {
@@ -28,6 +28,7 @@
   "devDependencies": {
     "env-cmd": "^10.1.0",
     "jest": "^29.6.2",
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "supertest": "^6.3.3"
   }
 }
