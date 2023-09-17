@@ -42,7 +42,6 @@ DELETE   /users/me
 POST     /users/me/avatar
 DELETE   /users/me/avatar
 GET      /users/:id/avatar
-
 ```
 
 #### Register new user
